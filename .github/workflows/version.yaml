@@ -1,0 +1,42 @@
+name: Extract Version
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: "The git tag to extract version info from"
+        required: true
+        type: string
+    outputs:
+      version:
+        description: "Extracted version string"
+        value: ${{ jobs.extract.outputs.version }}
+      track:
+        description: "Extracted track label"
+        value: ${{ jobs.extract.outputs.track }}
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.extract.outputs.version }}
+      track: ${{ steps.extract.outputs.track }}
+    steps:
+      - name: Extract version and track from tag
+        id: extract
+        run: |
+          TAG="${{ inputs.tag }}"
+          # version: e.g. "0.0.36" or "0.0.36-dev+test.23"
+          # track e.g. "dev" or "stable"
+          if [[ "$TAG" =~ ^([0-9]+\.[0-9]+\.[0-9]+)(-([^+]+))?(\+.*)?$ ]]; then
+            version="$TAG"
+            track="${BASH_REMATCH[3]}"
+            if [ -z "$track" ]; then
+              track="stable"
+            fi
+            echo "version=$version" >> $GITHUB_OUTPUT
+            echo "track=$track" >> $GITHUB_OUTPUT
+          else
+            echo "Invalid version format: $TAG" >&2
+            exit 1
+          fi

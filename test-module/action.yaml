@@ -1,0 +1,95 @@
+name: Test InfraWeave Module
+
+on:
+  workflow_call:
+    inputs:
+      central_account_id:
+        description: 'AWS Account ID'
+        required: true
+        type: string
+      workload_account_id:
+        description: 'AWS Account ID'
+        required: true
+        type: string
+      environment:
+        description: 'InfraWeave environment (e.g., dev, prod)'
+        required: true
+        type: string
+      region:
+        description: 'Region to use (default is us-west-2)'
+        required: false
+        type: string
+        default: us-west-2
+      identifier:
+        description: 'Commit sha'
+        required: true
+        type: string
+
+jobs:
+
+  prepare-test-module:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::${{ inputs.central_account_id }}:role/infraweave-oidc-role-${{ inputs.environment }}
+          aws-region: ${{ inputs.region }}
+
+      - name: Publish module to InfraWeave
+        run: |
+          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.69-rc.0/cli-linux-amd64
+          chmod +x infraweave
+          sudo mv infraweave /usr/local/bin
+          LOG_LEVEL=info infraweave module publish dev ./src --version "0.0.0-dev+${{ inputs.identifier }}"
+
+  discover-tests:
+    needs: prepare-test-module
+    runs-on: ubuntu-latest
+    outputs:
+      test-files: ${{ steps.discover.outputs.test_files }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Discover test files
+        id: discover
+        run: |
+          echo "Discovering Python test files..."
+          files=$(find tests -type f -name "*.py" | jq -R -s -c 'split("\n")[:-1]')
+          echo "Found files: $files"
+          echo "test_files=$files" >> $GITHUB_OUTPUT
+
+  run-tests:
+    needs: discover-tests
+    runs-on: ubuntu-latest
+    env:
+      MODULE_VERSION: 0.0.0-dev+${{ inputs.identifier }}
+      IDENTIFIER: ${{ inputs.identifier }}
+    strategy:
+      fail-fast: false # Tests need to finish to tear down successfully
+      matrix:
+        test_file: ${{ fromJson(needs.discover-tests.outputs.test-files) }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::${{ inputs.workload_account_id }}:role/infraweave-oidc-role-${{ inputs.environment }}
+          aws-region: ${{ inputs.region }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install InfraWeave python module
+        run: pip install infraweave==0.0.69rc0
+
+      - name: Run test file
+        run: python3 ${{ matrix.test_file }}
