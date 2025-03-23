@@ -1,27 +1,29 @@
 name: Test InfraWeave Module
 
-inputs:
-  central_account_id:
-    description: 'AWS Account ID'
-    required: true
-    type: string
-  workload_account_id:
-    description: 'AWS Account ID'
-    required: true
-    type: string
-  environment:
-    description: 'InfraWeave environment (e.g., dev, prod)'
-    required: true
-    type: string
-  region:
-    description: 'Region to use (default is us-west-2)'
-    required: false
-    type: string
-    default: us-west-2
-  identifier:
-    description: 'Commit sha'
-    required: true
-    type: string
+on:
+  workflow_call:
+    inputs:
+      central_account_id:
+        description: 'AWS Account ID'
+        required: true
+        type: string
+      workload_account_id:
+        description: 'AWS Account ID'
+        required: true
+        type: string
+      environment:
+        description: 'InfraWeave environment (e.g., dev, prod)'
+        required: true
+        type: string
+      region:
+        description: 'Region to use (default is us-west-2)'
+        required: false
+        type: string
+        default: us-west-2
+      identifier:
+        description: 'Commit sha'
+        required: true
+        type: string
 
 jobs:
   prepare-test-module:
