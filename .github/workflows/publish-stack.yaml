@@ -1,23 +1,25 @@
 name: Publish InfraWeave Stack
 
-inputs:
-  central_account_id:
-    description: 'AWS Account ID'
-    required: true
-    type: string
-  environment:
-    description: 'InfraWeave environment (e.g., dev, prod)'
-    required: true
-    type: string
-  version:
-    description: 'Version to publish'
-    required: true
-    type: string
-  region:
-    description: 'Region to use (default is us-west-2)'
-    required: false
-    type: string
-    default: us-west-2
+on:
+  workflow_call:
+    inputs:
+      central_account_id:
+        description: 'AWS Account ID'
+        required: true
+        type: string
+      environment:
+        description: 'InfraWeave environment (e.g., dev, prod)'
+        required: true
+        type: string
+      version:
+        description: 'Version to publish'
+        required: true
+        type: string
+      region:
+        description: 'Region to use (default is us-west-2)'
+        required: false
+        type: string
+        default: us-west-2
 
 jobs:
   extract-version:
