@@ -1,12 +1,12 @@
-# Github Actions
+# Github Actions 🚀
 
 This repository contains ready-to-use actions for your pipelines.
 
-## Example
+## Examples ✨
 
-Below are some example on how they can be used.
+Below are some example on how they can be used:
 
-### How to test a module
+### How to test a module 🧪
 
 This example expects the following structure:
 
@@ -66,7 +66,7 @@ jobs:
 
 ```
 
-### How to publish a module
+### How to publish a module 📦
 
 This example expects the following structure:
 
@@ -112,7 +112,7 @@ jobs:
       version: ${{ inputs.version }}
 ```
 
-### Example for publishing a stack
+### How to publish a stack 🏗️
 
 This example expects the following structure:
 
