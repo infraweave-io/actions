@@ -26,7 +26,9 @@ This example expects the following structure:
     └── test3-thirdcheck.py
 ```
 
-will lint the terraform code, and if it passes, it will find all python files in the `tests` folder and run them in parallel.
+This will:
+* lint the terraform code
+* if it passes; find all python files in the `tests` folder and run them in parallel
 
 ```yaml
 # Filename: ./github/workflows/test.yaml
@@ -83,7 +85,8 @@ This example expects the following structure:
 ...
 ```
 
-will publish InfraWeave module.
+This will:
+* publish an InfraWeave module with the desired version
 
 ```yaml
 # Filename: ./github/workflows/publish-module.yaml
@@ -129,7 +132,8 @@ This example expects the following structure:
 ...
 ```
 
-will publish InfraWeave stack.
+This will:
+* publish an InfraWeave stack with the desired version
 
 ```yaml
 # Filename: ./github/workflows/publish-stack.yaml
