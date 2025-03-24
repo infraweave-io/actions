@@ -125,10 +125,10 @@ This example expects the following structure:
 │   └── workflows/
 │       └── publish-stack.yaml
 ├── src
-│   ├── main.tf
-│   ├── module.yaml
-│   ├── outputs.tf
-│   └── variables.tf
+│   ├── claim-bucket.yaml
+│   ├── claim-ec2.yaml
+│   ├── claim-s3.yaml
+│   └── stack.yaml
 ...
 ```
 
