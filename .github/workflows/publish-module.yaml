@@ -43,7 +43,7 @@ jobs:
 
       - name: Publish module to InfraWeave
         run: |
-          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.74-rc.2/cli-linux-amd64
+          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.75/cli-linux-amd64
           chmod +x infraweave
           sudo mv infraweave /usr/local/bin
           infraweave module publish ${{ needs.extract-version.outputs.track }} ./src --version "${{ inputs.version }}"
