@@ -61,8 +61,8 @@ jobs:
     needs: terraform-lint
     uses: infraweave-io/actions/.github/workflows/test-module.yaml@1174452651015bd2db37dc33e73e9b19e85509a1 # v0.0.76
     with:
-      central_account_id: "000000000000"
-      workload_account_id: "111111111111"
+      central_account_id: "000000000000" # Modify this (recommended to use a variable)
+      workload_account_id: "111111111111" # Modify this (recommended to use a variable)
       environment: "prod"
       identifier: ${{ github.sha }}
 
@@ -110,7 +110,7 @@ jobs:
   publish-module-dev:
     uses: infraweave-io/actions/.github/workflows/publish-module.yaml@1174452651015bd2db37dc33e73e9b19e85509a1 # v0.0.76
     with:
-      central_account_id: "000000000000"
+      central_account_id: "000000000000" # Modify this (recommended to use a variable)
       environment: "prod"
       version: ${{ inputs.version }}
 ```
@@ -157,7 +157,7 @@ jobs:
   publish-module-dev:
     uses: infraweave-io/actions/.github/workflows/publish-stack.yaml@1174452651015bd2db37dc33e73e9b19e85509a1 # v0.0.76
     with:
-      central_account_id: "000000000000"
+      central_account_id: "000000000000" # Modify this (recommended to use a variable)
       environment: "prod"
       version: ${{ inputs.version }}
 
