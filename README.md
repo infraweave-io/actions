@@ -59,7 +59,7 @@ jobs:
 
   run-tests:
     needs: terraform-lint
-    uses: infraweave-io/actions/.github/workflows/test-module.yaml@9a5ce4d2681a2200361d05aa4a8ad689b2e3c8fc # v0.0.75
+    uses: infraweave-io/actions/.github/workflows/test-module.yaml@1174452651015bd2db37dc33e73e9b19e85509a1 # v0.0.76
     with:
       central_account_id: "000000000000"
       workload_account_id: "111111111111"
@@ -108,7 +108,7 @@ permissions:
 
 jobs:
   publish-module-dev:
-    uses: infraweave-io/actions/.github/workflows/publish-module.yaml@9a5ce4d2681a2200361d05aa4a8ad689b2e3c8fc # v0.0.75
+    uses: infraweave-io/actions/.github/workflows/publish-module.yaml@1174452651015bd2db37dc33e73e9b19e85509a1 # v0.0.76
     with:
       central_account_id: "000000000000"
       environment: "prod"
@@ -155,7 +155,7 @@ permissions:
 
 jobs:
   publish-module-dev:
-    uses: infraweave-io/actions/.github/workflows/publish-stack.yaml@9a5ce4d2681a2200361d05aa4a8ad689b2e3c8fc # v0.0.75
+    uses: infraweave-io/actions/.github/workflows/publish-stack.yaml@1174452651015bd2db37dc33e73e9b19e85509a1 # v0.0.76
     with:
       central_account_id: "000000000000"
       environment: "prod"
