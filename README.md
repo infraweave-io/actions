@@ -26,6 +26,8 @@ This example expects the following structure:
     └── test3-thirdcheck.py
 ```
 
+> See example of a test file here: https://preview.infraweave.io/python/#example
+
 This will:
 * lint the terraform code
 * if it passes; find all python files in the `tests` folder and run them in parallel
