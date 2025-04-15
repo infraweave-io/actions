@@ -42,7 +42,7 @@ jobs:
 
       - name: Publish stack to InfraWeave
         run: |
-          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.76/cli-linux-amd64
+          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.77/cli-linux-amd64
           chmod +x infraweave
           sudo mv infraweave /usr/local/bin
           infraweave stack publish ${{ needs.extract-version.outputs.track }} ./src --version "${{ inputs.version }}"

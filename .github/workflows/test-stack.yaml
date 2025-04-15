@@ -1,4 +1,4 @@
-name: Test InfraWeave Module
+name: Test InfraWeave Stack
 
 on:
   workflow_call:
@@ -26,7 +26,7 @@ on:
         type: string
 
 jobs:
-  prepare-test-module:
+  prepare-test-stack:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -38,15 +38,15 @@ jobs:
           role-to-assume: arn:aws:iam::${{ inputs.central_account_id }}:role/infraweave-oidc-role-${{ inputs.environment }}
           aws-region: ${{ inputs.region }}
 
-      - name: Publish module to InfraWeave
+      - name: Publish stack to InfraWeave
         run: |
           curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.77/cli-linux-amd64
           chmod +x infraweave
           sudo mv infraweave /usr/local/bin
-          LOG_LEVEL=info infraweave module publish dev ./src --version "0.0.0-dev+${{ inputs.identifier }}"
+          LOG_LEVEL=info infraweave stack publish dev ./src --version "0.0.0-dev+${{ inputs.identifier }}"
 
   discover-tests:
-    needs: prepare-test-module
+    needs: prepare-test-stack
     runs-on: ubuntu-latest
     outputs:
       test-files: ${{ steps.discover.outputs.test_files }}
@@ -66,7 +66,7 @@ jobs:
     needs: discover-tests
     runs-on: ubuntu-latest
     env:
-      MODULE_VERSION: 0.0.0-dev+${{ inputs.identifier }}
+      STACK_VERSION: 0.0.0-dev+${{ inputs.identifier }}
       IDENTIFIER: ${{ inputs.identifier }}
     strategy:
       fail-fast: false # Tests need to finish to tear down successfully
@@ -87,7 +87,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install InfraWeave python module
+      - name: Install InfraWeave python stack
         run: pip install infraweave==0.0.77
 
       - name: Run test file
