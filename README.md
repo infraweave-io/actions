@@ -157,10 +157,64 @@ permissions:
 
 jobs:
   publish-module-dev:
-    uses: infraweave-io/actions/.github/workflows/publish-stack.yaml@1174452651015bd2db37dc33e73e9b19e85509a1 # v0.0.76
+    uses: infraweave-io/actions/.github/workflows/publish-stack.yaml@f5b0268fcd51be540aff5a267d22b0eb5f24b2f0 # v0.0.77
     with:
       central_account_id: "000000000000" # Modify this (recommended to use a variable)
       environment: "prod"
       version: ${{ inputs.version }}
+
+```
+
+
+### How to test a stack 🧪
+
+This example expects the following structure:
+
+```
+.
+├── .github/
+│   └── workflows/
+│       └── test.yaml
+├── src
+│   ├── s3bucket.yaml
+│   ├── stack.yaml
+│   ├── ec2.yaml
+└── tests
+    ├── test1-something.py
+    ├── test2-othercheck.py
+    └── test3-thirdcheck.py
+```
+
+> See example of a test file here: https://preview.infraweave.io/python/#example
+
+This will:
+* find all python files in the `tests` folder and run them in parallel
+
+```yaml
+# Filename: ./github/workflows/test.yaml
+
+name: Test Stack
+
+on: push
+
+permissions:
+  id-token: write # for OIDC
+  contents: read
+
+jobs:
+  checkout:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+  run-tests:
+    needs: checkout
+    uses: infraweave-io/actions/.github/workflows/test-stack.yaml@f5b0268fcd51be540aff5a267d22b0eb5f24b2f0 # v0.0.77
+    with:
+      central_account_id: "000000000000" # Modify this (recommended to use a variable)
+      workload_account_id: "111111111111" # Modify this (recommended to use a variable)
+      environment: "prod"
+      identifier: ${{ github.sha }}
 
 ```
