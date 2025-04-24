@@ -40,7 +40,7 @@ jobs:
 
       - name: Publish stack to InfraWeave
         run: |
-          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.77/cli-linux-amd64
+          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.80/cli-linux-amd64
           chmod +x infraweave
           sudo mv infraweave /usr/local/bin
           LOG_LEVEL=info infraweave stack publish dev ./src --version "0.0.0-dev+${{ inputs.identifier }}"
@@ -88,7 +88,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install InfraWeave python stack
-        run: pip install infraweave==0.0.77
+        run: pip install infraweave==0.0.80
 
       - name: Run test file
         run: python3 ${{ matrix.test_file }}
