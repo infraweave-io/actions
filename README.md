@@ -44,7 +44,7 @@ permissions:
   contents: read
 
 jobs:
-  terraform-lint:
+  terraform-lint-validate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -58,9 +58,11 @@ jobs:
           curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
       - name: Run TFLint
         run: tflint --chdir "./src"
+      - name: Terraform Validate
+        run: terraform -chdir="./src" validate
 
   run-tests:
-    needs: terraform-lint
+    needs: terraform-lint-validate
     uses: infraweave-io/actions/.github/workflows/test-module.yaml@ba8503ab8b218417c1b1f42756c2ccadb1815f9a # v0.0.80
     with:
       central_account_id: "000000000000" # Modify this (recommended to use a variable)
