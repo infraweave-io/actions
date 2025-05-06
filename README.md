@@ -59,7 +59,9 @@ jobs:
       - name: Run TFLint
         run: tflint --chdir "./src"
       - name: Terraform Validate
-        run: terraform -chdir="./src" validate
+        run: |
+          terraform -chdir="./src" init
+          terraform -chdir="./src" validate
 
   run-tests:
     needs: terraform-lint-validate
