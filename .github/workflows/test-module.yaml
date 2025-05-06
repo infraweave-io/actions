@@ -24,6 +24,14 @@ on:
         description: 'Commit sha'
         required: true
         type: string
+      path_module:
+        description: 'Path to the module folder'
+        type: string
+        default: ./src
+      path_tests:
+        description: 'Path to the tests folder'
+        type: string
+        default: ./tests
 
 jobs:
   prepare-test-module:
@@ -58,7 +66,7 @@ jobs:
         id: discover
         run: |
           echo "Discovering Python test files..."
-          files=$(find tests -type f -name "*.py" | jq -R -s -c 'split("\n")[:-1]')
+          files=$(find ${{ inputs.path_tests }} -type f -name "test_*.py" | jq -R -s -c 'split("\n")[:-1]')
           echo "Found files: $files"
           echo "test_files=$files" >> $GITHUB_OUTPUT
 
