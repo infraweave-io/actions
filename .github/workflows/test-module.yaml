@@ -98,5 +98,13 @@ jobs:
       - name: Install InfraWeave python module
         run: pip install infraweave==0.0.80
 
+      - name: Install test dependencies
+        run: |
+          if [ -f "${{ inputs.path_tests }}/requirements.txt" ]; then
+            pip install -r "${{ inputs.path_tests }}/requirements.txt"
+          else
+            echo "No requirements.txt found in ${{ inputs.path_tests }}, skipping dependency installation."
+          fi
+
       - name: Run test file
         run: python3 ${{ matrix.test_file }}
