@@ -48,7 +48,7 @@ jobs:
 
       - name: Publish module to InfraWeave
         run: |
-          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.80/cli-linux-amd64
+          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.84/cli-linux-amd64
           chmod +x infraweave
           sudo mv infraweave /usr/local/bin
           LOG_LEVEL=info infraweave module publish dev ./src --version "0.0.0-dev+${{ inputs.identifier }}"
@@ -96,7 +96,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install InfraWeave python module
-        run: pip install infraweave==0.0.80
+        run: pip install infraweave==0.0.84
 
       - name: Install test dependencies
         run: |
