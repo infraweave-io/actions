@@ -65,11 +65,11 @@ jobs:
 
   run-tests:
     needs: terraform-lint-validate
-    uses: infraweave-io/actions/.github/workflows/test-module.yaml@ba8503ab8b218417c1b1f42756c2ccadb1815f9a # v0.0.80
+    uses: infraweave-io/actions/.github/workflows/test-module.yaml@ef869e65603a607d7bda29e6e298e107dcac54de # v0.0.84
     with:
       central_account_id: "000000000000" # Modify this (recommended to use a variable)
       workload_account_id: "111111111111" # Modify this (recommended to use a variable)
-      environment: "prod"
+      environment: "dev"
       identifier: ${{ github.sha }}
 
 ```
@@ -114,10 +114,10 @@ permissions:
 
 jobs:
   publish-module-dev:
-    uses: infraweave-io/actions/.github/workflows/publish-module.yaml@ba8503ab8b218417c1b1f42756c2ccadb1815f9a # v0.0.80
+    uses: infraweave-io/actions/.github/workflows/publish-module.yaml@ef869e65603a607d7bda29e6e298e107dcac54de # v0.0.84
     with:
       central_account_id: "000000000000" # Modify this (recommended to use a variable)
-      environment: "prod"
+      environment: "dev"
       version: ${{ inputs.version }}
 ```
 
@@ -161,10 +161,10 @@ permissions:
 
 jobs:
   publish-module-dev:
-    uses: infraweave-io/actions/.github/workflows/publish-stack.yaml@ba8503ab8b218417c1b1f42756c2ccadb1815f9a # v0.0.80
+    uses: infraweave-io/actions/.github/workflows/publish-stack.yaml@ef869e65603a607d7bda29e6e298e107dcac54de # v0.0.84
     with:
       central_account_id: "000000000000" # Modify this (recommended to use a variable)
-      environment: "prod"
+      environment: "dev"
       version: ${{ inputs.version }}
 
 ```
@@ -214,11 +214,11 @@ jobs:
 
   run-tests:
     needs: checkout
-    uses: infraweave-io/actions/.github/workflows/test-stack.yaml@ba8503ab8b218417c1b1f42756c2ccadb1815f9a # v0.0.80
+    uses: infraweave-io/actions/.github/workflows/test-stack.yaml@ef869e65603a607d7bda29e6e298e107dcac54de # v0.0.84
     with:
       central_account_id: "000000000000" # Modify this (recommended to use a variable)
       workload_account_id: "111111111111" # Modify this (recommended to use a variable)
-      environment: "prod"
+      environment: "dev"
       identifier: ${{ github.sha }}
 
 ```
