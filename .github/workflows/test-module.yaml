@@ -36,6 +36,8 @@ on:
 jobs:
   prepare-test-module:
     runs-on: ubuntu-latest
+    env:
+      INFRAWEAVE_ENV: ${{ inputs.environment }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -48,7 +50,7 @@ jobs:
 
       - name: Publish module to InfraWeave
         run: |
-          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.84/cli-linux-amd64
+          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.85/cli-linux-amd64
           chmod +x infraweave
           sudo mv infraweave /usr/local/bin
           LOG_LEVEL=info infraweave module publish dev ./src --version "0.0.0-dev+${{ inputs.identifier }}"
@@ -76,6 +78,7 @@ jobs:
     env:
       MODULE_VERSION: 0.0.0-dev+${{ inputs.identifier }}
       IDENTIFIER: ${{ inputs.identifier }}
+      INFRAWEAVE_ENV: ${{ inputs.environment }}
     strategy:
       fail-fast: false # Tests need to finish to tear down successfully
       matrix:
@@ -96,7 +99,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install InfraWeave python module
-        run: pip install infraweave==0.0.84
+        run: pip install infraweave==0.0.85
 
       - name: Install test dependencies
         run: |

@@ -30,6 +30,8 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     needs: extract-version
+    env:
+      INFRAWEAVE_ENV: ${{ inputs.environment }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -42,7 +44,7 @@ jobs:
 
       - name: Publish stack to InfraWeave
         run: |
-          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.84/cli-linux-amd64
+          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.85/cli-linux-amd64
           chmod +x infraweave
           sudo mv infraweave /usr/local/bin
           infraweave stack publish ${{ needs.extract-version.outputs.track }} ./src --version "${{ inputs.version }}"
