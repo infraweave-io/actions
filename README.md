@@ -65,7 +65,7 @@ jobs:
 
   run-tests:
     needs: terraform-lint-validate
-    uses: infraweave-io/actions/.github/workflows/test-module.yaml@ef869e65603a607d7bda29e6e298e107dcac54de # v0.0.84
+    uses: infraweave-io/actions/.github/workflows/test-module.yaml@8ba76f33d2f2f41a2e37e4c547390b31325e0567 # v0.0.85
     with:
       central_account_id: "000000000000" # Modify this (recommended to use a variable)
       workload_account_id: "111111111111" # Modify this (recommended to use a variable)
@@ -114,7 +114,7 @@ permissions:
 
 jobs:
   publish-module-dev:
-    uses: infraweave-io/actions/.github/workflows/publish-module.yaml@ef869e65603a607d7bda29e6e298e107dcac54de # v0.0.84
+    uses: infraweave-io/actions/.github/workflows/publish-module.yaml@8ba76f33d2f2f41a2e37e4c547390b31325e0567 # v0.0.85
     with:
       central_account_id: "000000000000" # Modify this (recommended to use a variable)
       environment: "dev"
@@ -161,7 +161,7 @@ permissions:
 
 jobs:
   publish-module-dev:
-    uses: infraweave-io/actions/.github/workflows/publish-stack.yaml@ef869e65603a607d7bda29e6e298e107dcac54de # v0.0.84
+    uses: infraweave-io/actions/.github/workflows/publish-stack.yaml@8ba76f33d2f2f41a2e37e4c547390b31325e0567 # v0.0.85
     with:
       central_account_id: "000000000000" # Modify this (recommended to use a variable)
       environment: "dev"
@@ -214,7 +214,7 @@ jobs:
 
   run-tests:
     needs: checkout
-    uses: infraweave-io/actions/.github/workflows/test-stack.yaml@ef869e65603a607d7bda29e6e298e107dcac54de # v0.0.84
+    uses: infraweave-io/actions/.github/workflows/test-stack.yaml@8ba76f33d2f2f41a2e37e4c547390b31325e0567 # v0.0.85
     with:
       central_account_id: "000000000000" # Modify this (recommended to use a variable)
       workload_account_id: "111111111111" # Modify this (recommended to use a variable)
