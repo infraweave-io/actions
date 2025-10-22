@@ -35,7 +35,7 @@ jobs:
 
       - name: Download InfraWeave CLI
         run: |
-          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.94-rc.2/cli-linux-amd64
+          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.94-rc.3/cli-linux-amd64
           chmod +x infraweave
           sudo mv infraweave /usr/local/bin
 
@@ -44,16 +44,11 @@ jobs:
         run: |
           echo "Discovering changed manifests..."
           
-          # Use explicit refs if available (from GitHub event), otherwise CLI will auto-detect
-          if [ -n "${{ github.event.before }}" ] && [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
-            # Push event with valid before SHA
-            matrix_json=$(PROVIDER=none infraweave gitops diff \
-              --before "${{ github.event.before }}" \
-              --after "${{ github.event.after }}")
-          else
-            # Pull request or first push - let CLI auto-detect based on branch
-            matrix_json=$(PROVIDER=none infraweave gitops diff)
-          fi
+          # Let CLI auto-detect refs based on GitHub context
+          matrix_json=$(PROVIDER=none \
+            CURRENT_BRANCH="${{ github.ref_name }}" \
+            DEFAULT_BRANCH="${{ github.event.repository.default_branch }}" \
+            infraweave gitops diff)
           
           echo "Discovered changes:"
           echo "$matrix_json" | jq '.'
@@ -68,22 +63,7 @@ jobs:
           else
             echo "Found $change_count infrastructure change(s)"
             echo "has_changes=true" >> $GITHUB_OUTPUT
-            
-            # Transform the output into a matrix format
-            # Add job-specific fields for the matrix
-            matrix_with_jobs=$(echo "$matrix_json" | jq -c '{include: [.[] | {
-              name: .name,
-              kind: .kind,
-              namespace: .namespace,
-              region: .region,
-              apiVersion: .apiVersion,
-              action: .action,
-              path: .path,
-              content: .content,
-              job_name: "\(.kind)/\(.name) (\(.namespace)) - \(.action)"
-            }]}')
-            
-            echo "matrix=$matrix_with_jobs" >> $GITHUB_OUTPUT
+            echo "matrix=$(echo "$matrix_json" | jq -c '{include: .}')" >> $GITHUB_OUTPUT
           fi
 
   apply-changes:
@@ -91,11 +71,11 @@ jobs:
     if: needs.discover-changes.outputs.has-changes == 'true'
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false  # Continue even if one deployment fails
-      max-parallel: 10   # Limit concurrent deployments
+      fail-fast: false
+      max-parallel: 10
       matrix: ${{ fromJson(needs.discover-changes.outputs.matrix) }}
     
-    name: ${{ matrix.job_name }}
+    name: ${{ matrix.kind }}/${{ matrix.name }} (${{ matrix.namespace }}) - ${{ matrix.action }}
     
     steps:
       - name: Checkout Repository
@@ -109,69 +89,55 @@ jobs:
 
       - name: Download InfraWeave CLI
         run: |
-          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.94-rc.2/cli-linux-amd64
+          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.94-rc.3/cli-linux-amd64
           chmod +x infraweave
           sudo mv infraweave /usr/local/bin
 
-      - name: Install yq
+      - name: Write manifest to file
+        if: matrix.action != 'destroy' && matrix.action != 'rename'
         run: |
-          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-          sudo chmod +x /usr/local/bin/yq
-
-      - name: Write manifest to temporary file
-        run: |
-          echo "Writing manifest content to temporary file..."
-          echo '${{ matrix.content }}' | yq -P '.' > /tmp/manifest.yaml
-          echo "Manifest written:"
+          mkdir -p /tmp
+          cat << 'EOF' > /tmp/manifest.yaml
+          ${{ matrix.content }}
+          EOF
+          echo "Manifest written to /tmp/manifest.yaml"
           cat /tmp/manifest.yaml
 
-      - name: Run InfraWeave command
-        id: infraweave
+      - name: Apply infrastructure changes
+        if: matrix.action == 'apply'
         run: |
-          echo "Running InfraWeave ${{ matrix.action }} for ${{ matrix.kind }}/${{ matrix.name }}"
-          
-          # Determine the command based on action
-          case "${{ matrix.action }}" in
-            apply)
-              echo "Applying infrastructure changes..."
-              echo Would run: infraweave apply github-${{ github.repository }}/${{ matrix.namespace }} /tmp/manifest.yaml
-              ;;
-            plan)
-              echo "Planning infrastructure changes..."
-              echo Would run: infraweave plan github-${{ github.repository }}/${{ matrix.namespace }} /tmp/manifest.yaml
-              ;;
-            destroy)
-              echo "Destroying infrastructure..."
-              echo Would run: infraweave destroy github-${{ github.repository }}/${{ matrix.namespace }} ${{ matrix.kind }}/${{ matrix.name }}
-              ;;
-            rename)
-              echo "File renamed - no infrastructure changes needed"
-              echo "The manifest file path changed, but infrastructure remains the same."
-              ;;
-            *)
-              echo "Unknown action: ${{ matrix.action }}"
-              exit 1
-              ;;
-          esac
+          echo "Applying ${{ matrix.kind }}/${{ matrix.name }} to namespace ${{ matrix.namespace }}"
+          infraweave apply github-${{ github.repository }}/${{ matrix.namespace }} /tmp/manifest.yaml
 
-      - name: Comment on PR (if applicable)
+      - name: Plan infrastructure changes
+        if: matrix.action == 'plan'
+        run: |
+          echo "Planning ${{ matrix.kind }}/${{ matrix.name }} in namespace ${{ matrix.namespace }}"
+          infraweave plan github-${{ github.repository }}/${{ matrix.namespace }} /tmp/manifest.yaml
+
+      - name: Destroy infrastructure
+        if: matrix.action == 'destroy'
+        run: |
+          echo "Destroying ${{ matrix.kind }}/${{ matrix.name }} from namespace ${{ matrix.namespace }}"
+          infraweave destroy github-${{ github.repository }}/${{ matrix.namespace }} ${{ matrix.kind }}/${{ matrix.name }}
+
+      - name: Handle rename
+        if: matrix.action == 'rename'
+        run: |
+          echo "File renamed - no infrastructure changes needed"
+          echo "The manifest file path changed from ${{ matrix.path }}, but infrastructure remains the same."
+
+      - name: Comment on PR with plan
         if: github.event_name == 'pull_request' && matrix.action == 'plan'
         uses: actions/github-script@v7
         with:
           script: |
-            const action = '${{ matrix.action }}';
-            const kind = '${{ matrix.kind }}';
-            const name = '${{ matrix.name }}';
-            const namespace = '${{ matrix.namespace }}';
-            const region = '${{ matrix.region }}';
-            const path = '${{ matrix.path }}';
+            const body = `## Infrastructure Plan: \`${{ matrix.kind }}/${{ matrix.name }}\`
             
-            const body = `## Infrastructure Plan: \`${kind}/${name}\`
-            
-            **Namespace:** \`${namespace}\`  
-            **Region:** \`${region}\`  
-            **File:** \`${path}\`  
-            **Action:** \`${action}\`
+            **Namespace:** \`${{ matrix.namespace }}\`  
+            **Region:** \`${{ matrix.region }}\`  
+            **File:** \`${{ matrix.path }}\`  
+            **Action:** \`${{ matrix.action }}\`
             
             <details>
             <summary>📄 View Manifest</summary>
