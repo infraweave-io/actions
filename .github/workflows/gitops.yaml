@@ -93,6 +93,14 @@ jobs:
           chmod +x infraweave
           sudo mv infraweave /usr/local/bin
 
+      - name: Set repository path
+        id: repo
+        run: |
+          # Convert repository to lowercase and replace slashes with hyphens for InfraWeave naming requirements
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]' | tr '/' '-')
+          echo "path=github-${REPO_LOWER}/${{ matrix.namespace }}" >> $GITHUB_OUTPUT
+          echo "Repository path: github-${REPO_LOWER}/${{ matrix.namespace }}"
+
       - name: Write manifest to file
         if: matrix.action != 'destroy' && matrix.action != 'rename'
         run: |
@@ -107,19 +115,19 @@ jobs:
         if: matrix.action == 'apply'
         run: |
           echo "Applying ${{ matrix.kind }}/${{ matrix.name }} to namespace ${{ matrix.namespace }}"
-          infraweave apply github-${{ github.repository }}/${{ matrix.namespace }} /tmp/manifest.yaml
+          infraweave apply ${{ steps.repo.outputs.path }} /tmp/manifest.yaml
 
       - name: Plan infrastructure changes
         if: matrix.action == 'plan'
         run: |
           echo "Planning ${{ matrix.kind }}/${{ matrix.name }} in namespace ${{ matrix.namespace }}"
-          infraweave plan github-${{ github.repository }}/${{ matrix.namespace }} /tmp/manifest.yaml
+          infraweave plan ${{ steps.repo.outputs.path }} /tmp/manifest.yaml
 
       - name: Destroy infrastructure
         if: matrix.action == 'destroy'
         run: |
           echo "Destroying ${{ matrix.kind }}/${{ matrix.name }} from namespace ${{ matrix.namespace }}"
-          infraweave destroy github-${{ github.repository }}/${{ matrix.namespace }} ${{ matrix.kind }}/${{ matrix.name }}
+          infraweave destroy ${{ steps.repo.outputs.path }} ${{ matrix.kind }}/${{ matrix.name }}
 
       - name: Handle rename
         if: matrix.action == 'rename'
@@ -178,4 +186,5 @@ jobs:
           if [ "${{ needs.apply-changes.result }}" == "failure" ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "⚠️ Some deployments failed. Please review the logs above." >> $GITHUB_STEP_SUMMARY
+            exit 1
           fi
