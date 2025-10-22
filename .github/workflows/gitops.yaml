@@ -1,13 +1,11 @@
 name: InfraWeave GitOps
 
 on:
-  push:
-    branches:
-      - main
-      - '**'  # Run on all branches
-  pull_request:
-    branches:
-      - main
+  workflow_call:
+    secrets:
+      AWS_ACCOUNT_ID:
+        required: true
+        description: 'AWS Account ID for OIDC role assumption'
 
 jobs:
   discover-changes:
