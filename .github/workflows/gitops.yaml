@@ -16,6 +16,11 @@ on:
         required: false
         type: string
         default: us-west-2
+
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   discover-changes:
     runs-on: ubuntu-latest
