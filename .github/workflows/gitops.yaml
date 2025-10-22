@@ -2,11 +2,20 @@ name: InfraWeave GitOps
 
 on:
   workflow_call:
-    secrets:
-      AWS_ACCOUNT_ID:
+    inputs:
+      account_id:
+        description: 'AWS Account ID'
         required: true
-        description: 'AWS Account ID for OIDC role assumption'
-
+        type: string
+      environment:
+        description: 'InfraWeave environment (e.g., dev, prod)'
+        required: true
+        type: string
+      region:
+        description: 'Region to use (default is us-west-2)'
+        required: false
+        type: string
+        default: us-west-2
 jobs:
   discover-changes:
     runs-on: ubuntu-latest
@@ -90,8 +99,7 @@ jobs:
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          # TODO: Make these dynamic based on repository/environment
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/infraweave-github-actions-role
+          role-to-assume: arn:aws:iam::${{ inputs.account_id }}:role/infraweave-oidc-role-${{ inputs.environment }}
           aws-region: ${{ matrix.region }}
 
       - name: Download InfraWeave CLI
