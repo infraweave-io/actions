@@ -35,7 +35,7 @@ jobs:
 
       - name: Download InfraWeave CLI
         run: |
-          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.94-rc.3/cli-linux-amd64
+          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.94-rc.5/cli-linux-amd64
           chmod +x infraweave
           sudo mv infraweave /usr/local/bin
 
@@ -89,7 +89,7 @@ jobs:
 
       - name: Download InfraWeave CLI
         run: |
-          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.94-rc.3/cli-linux-amd64
+          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.94-rc.5/cli-linux-amd64
           chmod +x infraweave
           sudo mv infraweave /usr/local/bin
 
@@ -121,7 +121,7 @@ jobs:
         if: matrix.action == 'plan'
         run: |
           echo "Planning ${{ matrix.kind }}/${{ matrix.name }} in namespace ${{ matrix.namespace }}"
-          infraweave plan ${{ steps.repo.outputs.path }} /tmp/manifest.yaml
+          infraweave plan ${{ steps.repo.outputs.path }} /tmp/manifest.yaml ${{ join(matrix.flags, ' ') }}
 
       - name: Destroy infrastructure
         if: matrix.action == 'destroy'
