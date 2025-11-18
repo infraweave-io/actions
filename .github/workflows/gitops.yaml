@@ -79,7 +79,7 @@ jobs:
 
       - name: Download InfraWeave CLI
         run: |
-          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.94-rc.7/cli-linux-amd64
+          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.1.4-rc.1/cli-linux-amd64
           chmod +x infraweave
           sudo mv infraweave /usr/local/bin
 
@@ -133,7 +133,7 @@ jobs:
 
       - name: Download InfraWeave CLI
         run: |
-          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.0.94-rc.7/cli-linux-amd64
+          curl -L -o infraweave https://github.com/infraweave-io/infraweave/releases/download/v0.1.4-rc.1/cli-linux-amd64
           chmod +x infraweave
           sudo mv infraweave /usr/local/bin
 
@@ -159,7 +159,7 @@ jobs:
         if: matrix.action == 'apply'
         run: |
           echo "Applying ${{ matrix.kind }}/${{ matrix.name }} to namespace ${{ matrix.namespace }}"
-          infraweave apply ${{ steps.repo.outputs.path }} /tmp/manifest.yaml --follow 2>&1 | tee /tmp/output.txt
+          infraweave apply -e ${{ steps.repo.outputs.path }} /tmp/manifest.yaml --follow 2>&1 | tee /tmp/output.txt
 
           {
             echo "### \`${{ matrix.kind }}/${{ matrix.name }}\` (\`${{ matrix.namespace }}\`)"
@@ -169,7 +169,7 @@ jobs:
             echo "<summary>View full apply details</summary>"
             echo ""
             echo '```terraform'
-            sed -n '/^Terraform used the selected providers/,/^─────────────────────────────────────────────────────────────────────────────$/p' /tmp/output.txt
+            cat /tmp/output.txt
             echo '```'
             echo ""
             echo "</details>"
@@ -180,7 +180,7 @@ jobs:
         if: matrix.action == 'plan'
         run: |
           echo "Planning ${{ matrix.kind }}/${{ matrix.name }} in namespace ${{ matrix.namespace }}"
-          infraweave plan ${{ steps.repo.outputs.path }} /tmp/manifest.yaml --follow ${{ join(matrix.flags, ' ') }} 2>&1 | tee /tmp/output.txt
+          infraweave plan -e ${{ steps.repo.outputs.path }} /tmp/manifest.yaml --follow ${{ join(matrix.flags, ' ') }} 2>&1 | tee /tmp/output.txt
 
           {
             echo "### \`${{ matrix.kind }}/${{ matrix.name }}\` (\`${{ matrix.namespace }}\`)"
@@ -190,7 +190,7 @@ jobs:
             echo "<summary>View full plan details</summary>"
             echo ""
             echo '```terraform'
-            sed -n '/^Terraform used the selected providers/,/^─────────────────────────────────────────────────────────────────────────────$/p' /tmp/output.txt
+            cat /tmp/output.txt
             echo '```'
             echo ""
             echo "</details>"
@@ -201,7 +201,7 @@ jobs:
         if: matrix.action == 'destroy'
         run: |
           echo "Destroying ${{ matrix.kind }}/${{ matrix.name }} from namespace ${{ matrix.namespace }}"
-          infraweave destroy ${{ steps.repo.outputs.path }} ${{ matrix.kind }}/${{ matrix.name }} --follow 2>&1 | tee /tmp/output.txt
+          infraweave destroy -e ${{ steps.repo.outputs.path }} ${{ matrix.kind }}/${{ matrix.name }} --follow 2>&1 | tee /tmp/output.txt
 
           {
             echo "### \`${{ matrix.kind }}/${{ matrix.name }}\` (\`${{ matrix.namespace }}\`)"
@@ -211,7 +211,7 @@ jobs:
             echo "<summary>View full destroy details</summary>"
             echo ""
             echo '```terraform'
-            sed -n '/^Terraform used the selected providers/,/^─────────────────────────────────────────────────────────────────────────────$/p' /tmp/output.txt
+            cat /tmp/output.txt
             echo '```'
             echo ""
             echo "</details>"
